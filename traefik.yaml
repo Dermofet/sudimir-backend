@@ -1,0 +1,46 @@
+# log:
+#   level: "DEBUG"
+
+# api:
+#   dashboard: true
+
+# entryPoints:
+#   web:
+#     address: ":80"
+
+# providers:
+#   docker:
+#     endpoint: "unix:///var/run/docker.sock"
+#     exposedByDefault: false
+
+# # certificatesResolvers:
+# #   myresolver:
+# #     acme:
+# #       email: "ваш-email@example.com"
+# #       storage: "/etc/traefik/acme/acme.json"
+# #       httpChallenge:
+# #         entryPoint: web
+
+# http:
+#   routers:
+#     backend:
+#       rule: "Host(`backend.sudimir`) && PathPrefix(`/api`)"
+#       entryPoints:
+#         - web
+#       service: backend
+#       middlewares:
+#         - backend-strip
+
+#   middlewares:
+#     backend-strip:
+#       stripprefix:
+#         prefixes:
+#           - /api
+#         forceSlash: false
+
+#   services:
+#     backend:
+#       loadBalancer:
+#         servers:
+#           - url: "http://backend:8000"
+
