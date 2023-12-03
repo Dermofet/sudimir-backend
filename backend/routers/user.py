@@ -12,6 +12,31 @@ from backend.utils.auth import get_user_from_access_token
 router = APIRouter(dependencies=[Depends(verify_access_token)], prefix="/user")
 
 
+@router.post(
+    "/new",
+    status_code=status.HTTP_201_CREATED,
+    summary="Создать пользователя",
+    response_description="Пользователь успешно создан",
+    response_model=models.UserGet,
+    responses={
+        400: models.errors.BAD_REQUEST,
+        401: models.errors.UNAUTHORIZED,
+        403: models.errors.FORBIDDEN,
+        422: models.errors.UNPROCESSABLE_ENTITY,
+        429: models.errors.TOO_MANY_REQUESTS,
+        500: models.errors.INTERNAL_SERVER_ERROR,
+        503: models.errors.SERVICE_UNAVAILABLE,
+    },
+)
+async def create_user(
+    user: models.UserSignUp = Body(..., description="Тело запроса для создания пользователя"),
+    requester_id: UUID4 = Depends(get_user_from_access_token),
+    user_service: UserService = Depends(),
+) -> models.UserGet:
+    return await user_service.create_user(requester_id, user=user)
+
+
+
 @router.get(
     "/me",
     status_code=status.HTTP_200_OK,
@@ -82,7 +107,6 @@ async def patch_current_user(
 ) -> models.UserGet:
     return await user_service.change_user(user_id=user_id, guid=user_id, user=user)
 
-
 @router.get(
     "/me/bookings",
     status_code=status.HTTP_200_OK,
@@ -105,7 +129,32 @@ async def get_user_bookings(
     user_id: UUID4 = Depends(get_user_from_access_token),
     user_service: UserService = Depends(),
 ) -> models.UserGet:
-    return await user_service.get_all_bookings_by_id(user_id=user_id, limit=limit, offset=offset)
+    return await user_service.get_all_bookings_by_id(recipient_id=user_id, user_id=user_id, limit=limit, offset=offset)
+
+@router.get(
+    "/{id}/bookings",
+    status_code=status.HTTP_200_OK,
+    summary="Получить список забронированных услуг пользователя",
+    response_description="Список забронированных услуг пользователя успешно получен",
+    response_model=List[models.BookingGet],
+    responses={
+        400: models.errors.BAD_REQUEST,
+        401: models.errors.UNAUTHORIZED,
+        403: models.errors.FORBIDDEN,
+        422: models.errors.UNPROCESSABLE_ENTITY,
+        429: models.errors.TOO_MANY_REQUESTS,
+        500: models.errors.INTERNAL_SERVER_ERROR,
+        503: models.errors.SERVICE_UNAVAILABLE,
+    },
+)
+async def get_user_bookings(
+    limit: int = Query(default=10, description="Количество забронированных услуг", alias="limit"),
+    offset: int = Query(default=0, description="Смещение", alias="offset"),
+    user_id: UUID4 = Path(..., description="Идентификатор пользователя", alias="id"),
+    recipient_id: UUID4 = Depends(get_user_from_access_token),
+    user_service: UserService = Depends(),
+) -> models.UserGet:
+    return await user_service.get_all_bookings_by_id(recipient_id=recipient_id, user_id=user_id, limit=limit, offset=offset)
 
 @router.get(
     "/all",

@@ -1,6 +1,6 @@
-from typing import Tuple, List
+from typing import List
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from backend.logging import log
 from pydantic import UUID4
 
@@ -12,6 +12,20 @@ from backend.utils.user import check_user_existence_and_access
 class UserService:
     def __init__(self, db_facade: DBFacadeInterface = Depends(get_db_facade)):
         self._db_facade = db_facade
+
+    async def create_user(self, requester_id: UUID4, user: models.UserSignUp) -> models.UserGet:
+        """Создать пользователя"""
+
+        log.debug(f"Пользователь {requester_id}: запрос на создание пользователя: {user}")
+
+        user = await self._db_facade.get_user_by_id(guid=requester_id)
+        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN))
+
+        db_user = await self._db_facade.signup(user=user)
+
+        log.debug(f"Пользователь {requester_id}: создание пользователя: {user}")
+
+        return db_user
 
     async def get_all_users(self, user_id: UUID4, limit: int, offset: int) -> List[models.UserGet]:
         """Получить список пользователей"""
@@ -70,19 +84,19 @@ class UserService:
 
         return db_users
 
-    async def get_all_bookings_by_id(self, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
+    async def get_all_bookings_by_id(self, recipient_id: UUID4, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
         """Получить список брони по id пользователя"""
 
-        log.debug(f"Пользователь {user_id}: запрос на получение всех бронирований: {limit}, {offset}")
+        log.debug(f"Пользователь {recipient_id}: запрос на получение всех бронирований пользователя {user_id}: {limit}, {offset}")
 
-        user = await self._db_facade.get_user_by_id(guid=user_id)
+        user = await self._db_facade.get_user_by_id(guid=recipient_id)
         await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN,
                                                                 models.UserRole.WORKER,
                                                                 models.UserRole.USER))
 
         db_bookings = await self._db_facade.get_all_bookings_by_user_id(user_id=user_id, limit=limit, offset=offset)
 
-        log.debug(f"Пользователь {user_id}: успешно получены бронирования")
+        log.debug(f"Пользователь {recipient_id}: успешно получены бронирования")
 
         return db_bookings
 

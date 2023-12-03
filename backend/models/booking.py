@@ -18,6 +18,7 @@ class BookingStatusUpdate(ApiModel):
 class BookingBase(ApiModel):
     service_guid: UUID4 = Field(..., description="Идентификатор услуги")
     number_persons: int = Field(..., description="Количество человек")
+    status: BookingStatusType = Field(..., description="Статус брони")
 
     model_config = ConfigDict(json_encoders={
         dt: lambda d: d.strftime('%d-%m-%Y %H:%M')
@@ -48,4 +49,4 @@ class BookingGet(BookingBase):
     user_updated: UUID4 = Field(..., description="Идентификатор пользователя, обновившего услугу")
 
     created_at: dt = Field(..., description="Время создания услуги в формате RFC-3339")
-    updated_at: dt = Field(..., description="Время последнего услуги сер в формате RFC-3339")
+    updated_at: dt = Field(..., description="Время последнего обновления услуги в формате RFC-3339")

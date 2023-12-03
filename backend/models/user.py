@@ -92,7 +92,7 @@ class UserForgotPassword(ApiModel):
         if not v and not values.get('phone'):
             raise ValueError("Одно из полей 'phone' или 'email' должно быть заполнено")
         return v
-
+    
 class UserUpdate(UserBase):
     pass
 

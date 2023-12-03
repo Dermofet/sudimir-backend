@@ -17,13 +17,13 @@ class UserDAO:
     async def create(self, user: models.UserSignUp) -> models.UserGet:
         """Создание пользователя"""
 
-        db_user = tables.User(**user.dict())
+        db_user = tables.User(**user.model_dump())
 
         self._session.add(db_user)
         await self._session.flush()
         await self._session.refresh(db_user)
 
-        return models.UserGet.from_orm(db_user)
+        return models.UserGet.model_validate(db_user)
 
     async def get_by_email(self, email: str) -> Optional[models.UserGet]:
         """Получение пользователя по email"""
@@ -31,7 +31,7 @@ class UserDAO:
         query = select(tables.User).where(tables.User.email == email)
         db_user = (await self._session.execute(query)).scalar()
 
-        return models.UserGet.from_orm(db_user) if db_user else None
+        return models.UserGet.model_validate(db_user) if db_user else None
 
     async def get_by_phone(self, phone: str) -> Optional[models.UserGet]:
         """Получение пользователя по номеру телефона"""
@@ -39,7 +39,7 @@ class UserDAO:
         query = select(tables.User).where(tables.User.phone == phone)
         db_user = (await self._session.execute(query)).scalar()
 
-        return models.UserGet.from_orm(db_user) if db_user else None
+        return models.UserGet.model_validate(db_user) if db_user else None
 
     async def get_by_id(self, guid: UUID4) -> Optional[models.UserGet]:
         """Получение пользователя по id"""
@@ -47,7 +47,7 @@ class UserDAO:
         query = select(tables.User).where(tables.User.guid == guid)
         db_user = (await self._session.execute(query)).scalar()
 
-        return models.UserGet.from_orm(db_user) if db_user else None
+        return models.UserGet.model_validate(db_user) if db_user else None
 
     async def get_all(self, limit: int, offset:int) -> Optional[models.UserGet]:
         """Получение списка пользователей"""
@@ -55,7 +55,7 @@ class UserDAO:
         query = select(tables.User).limit(limit).offset(offset)
         db_users = (await self._session.execute(query)).scalars().unique().all()
 
-        return [models.UserGet.from_orm(db_user) for db_user in db_users]
+        return [models.UserGet.model_validate(db_user) for db_user in db_users]
 
     async def get_all_with_role(self, limit: int, offset:int, role: models.UserRole) -> List[models.UserGet]:
         """Получение всех пользователей с определенной ролью"""
@@ -63,20 +63,20 @@ class UserDAO:
         query = select(tables.User).where(tables.User.role == role).limit(limit).offset(offset)
         db_users = (await self._session.execute(query)).scalars().unique().all()
 
-        return [models.UserGet.from_orm(db_user) for db_user in db_users]
+        return [models.UserGet.model_validate(db_user) for db_user in db_users]
 
     async def change(self, guid: UUID4, user: models.UserUpdate) -> models.UserGet:
         """Изменение пользователя"""
 
         db_user = (await self._session.execute(select(tables.User).where(tables.User.guid == guid))).scalar()
 
-        query = update(tables.User).where(tables.User.guid == guid).values(**user.dict())
+        query = update(tables.User).where(tables.User.guid == guid).values(**user.model_dump())
         await self._session.execute(query)
 
         await self._session.flush()
         await self._session.refresh(db_user)
 
-        return models.UserGet.from_orm(db_user)
+        return models.UserGet.model_validate(db_user)
 
     async def delete(self, guid: UUID4) -> None:
         """Удаление пользователя"""

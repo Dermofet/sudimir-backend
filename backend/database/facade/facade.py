@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend import models
 from backend.database.connection import get_session
 from backend.database.dao import *
+from backend.database.dao.booking import BookingDAO
 from backend.database.facade.interface import DBFacadeInterface
 
 
@@ -19,6 +20,7 @@ class DBFacade(DBFacadeInterface):
         self._session = session
         self._user_dao = UserDAO(session=session)
         self._service_dao = ServiceDAO(session=session)
+        self._booking_dao = BookingDAO(session=session)
 
     async def commit(self) -> None:
         """Применение изменений"""
@@ -106,10 +108,10 @@ class DBFacade(DBFacadeInterface):
 
         return await self._service_dao.delete(guid=guid)
 
-    async def create_booking(self, booking: models.BookingCreate) -> models.BookingGet:
+    async def create_booking(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создание брони"""
 
-        return await self._booking_dao.create(booking=booking)
+        return await self._booking_dao.create(requester_id=requester_id, user_id=user_id, booking=booking)
 
     async def get_booking_by_id(self, guid: UUID4) -> models.BookingGet:
         """Получение брони по id"""

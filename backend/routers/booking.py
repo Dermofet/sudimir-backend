@@ -13,7 +13,7 @@ router = APIRouter(dependencies=[Depends(verify_access_token)], prefix="/booking
 
 
 @router.post(
-    "/new",
+    "/new/user/me",
     status_code=status.HTTP_201_CREATED,
     summary="Создать бронь",
     response_description="Бронь успешно создана",
@@ -33,7 +33,32 @@ async def create_booking(
     user_id: UUID4 = Depends(get_user_from_access_token),
     booking_service: BookingService = Depends(),
 ) -> models.BookingGet:
-    return await booking_service.create_booking(user_id=user_id, booking=booking)
+    return await booking_service.create_booking(requester_id=user_id, user_id=user_id, booking=booking)
+
+
+@router.post(
+    "/new/user/{user_id}",
+    status_code=status.HTTP_201_CREATED,
+    summary="Создать бронь",
+    response_description="Бронь успешно создана",
+    response_model=models.BookingGet,
+    responses={
+        400: models.errors.BAD_REQUEST,
+        401: models.errors.UNAUTHORIZED,
+        403: models.errors.FORBIDDEN,
+        422: models.errors.UNPROCESSABLE_ENTITY,
+        429: models.errors.TOO_MANY_REQUESTS,
+        500: models.errors.INTERNAL_SERVER_ERROR,
+        503: models.errors.SERVICE_UNAVAILABLE,
+    },
+)
+async def create_booking(
+    booking: models.BookingCreate = Body(..., description="Тело брони"),
+    user_id: UUID4 = Path(..., description="Идентификатор пользователя, на имя которого создается бронь", alias="user_id"),
+    requester_id: UUID4 = Depends(get_user_from_access_token),
+    booking_service: BookingService = Depends(),
+) -> models.BookingGet:
+    return await booking_service.create_booking(requester_id=requester_id, user_id=user_id, booking=booking)
 
 
 @router.get(

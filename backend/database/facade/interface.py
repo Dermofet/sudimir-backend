@@ -91,7 +91,7 @@ class DBFacadeInterface(ABC):
         ...
 
     @abstractmethod
-    async def create_booking(self, booking: models.BookingCreate) -> models.BookingGet:
+    async def create_booking(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создание бронирования"""
         ...
 

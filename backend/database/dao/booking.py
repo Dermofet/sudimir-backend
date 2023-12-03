@@ -15,16 +15,19 @@ class BookingDAO:
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def create(self, booking: models.BookingCreate) -> models.BookingGet:
+    async def create(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создание брони"""
 
-        db_booking = tables.Booking(**booking.dict())
+        db_booking = tables.Booking(**booking.model_dump(), 
+                                    user_guid=user_id, 
+                                    user_created=requester_id, 
+                                    user_updated=requester_id)
 
         self._session.add(db_booking)
         await self._session.flush()
         await self._session.refresh(db_booking)
 
-        return models.BookingGet.from_orm(db_booking)
+        return models.BookingGet.model_validate(db_booking)
 
     async def get_by_id(self, guid: UUID4) -> Optional[models.BookingGet]:
         """Получение брони по id"""
@@ -32,15 +35,15 @@ class BookingDAO:
         query = select(tables.Booking).where(tables.Booking.guid == guid)
         db_booking = (await self._session.execute(query)).scalar()
 
-        return models.BookingGet.from_orm(db_booking) if db_booking else None
+        return models.BookingGet.model_validate(db_booking) if db_booking else None
 
     async def get_all_by_user_id(self, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
         """Получение всех броней по id пользователя"""
 
-        query = select(tables.Booking).where(tables.Booking.user_id == user_id).limit(limit).offset(offset)
+        query = select(tables.Booking).where(tables.Booking.user_guid == user_id).limit(limit).offset(offset)
         db_bookings = (await self._session.execute(query)).scalars().unique().all()
 
-        return [models.BookingGet.from_orm(db_booking) for db_booking in db_bookings]
+        return [models.BookingGet.model_validate(db_booking) for db_booking in db_bookings]
 
     async def change_status(self, guid: UUID4, status: models.BookingStatusType) -> models.BookingGet:
         """Изменение статуса брони"""
@@ -48,7 +51,7 @@ class BookingDAO:
         query = select(tables.Booking).where(tables.Booking.guid == guid).update({"status": status})
         db_booking = (await self._session.execute(query)).scalar()
 
-        return models.BookingGet.from_orm(db_booking) if db_booking else None
+        return models.BookingGet.model_validate(db_booking) if db_booking else None
 
     async def change(self, guid: UUID4, booking: models.BookingUpdate) -> models.BookingGet:
         """Изменение брони"""
@@ -56,13 +59,13 @@ class BookingDAO:
         query = select(tables.Booking).where(tables.Booking.guid == guid)
         db_booking = (await self._session.execute(query)).scalar()
 
-        query = update(tables.Service).where(tables.Service.guid == guid).values(**booking.dict())
+        query = update(tables.Service).where(tables.Service.guid == guid).values(**booking.model_dump())
         await self._session.execute(query)
 
         await self._session.flush()
         await self._session.refresh(db_booking)
 
-        return models.ServiceGet.from_orm(db_booking)
+        return models.ServiceGet.model_validate(db_booking)
 
     async def delete(self, guid: UUID4) -> None:
         """Удаление брони"""
