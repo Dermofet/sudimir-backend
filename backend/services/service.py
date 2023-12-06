@@ -41,12 +41,12 @@ class ServiceService:
 
         return db_service
 
-    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGet]:
+    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
         """Получение списка услуг"""
 
         log.debug("Запрос на получение списка услуг")
 
-        db_services = await self._db_facade.get_services(limit=limit, offset=offset)
+        db_services = await self._db_facade.get_all_services(limit=limit, offset=offset)
 
         log.debug("Услуги слуги успешно получены")
 

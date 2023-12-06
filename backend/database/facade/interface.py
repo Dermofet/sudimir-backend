@@ -76,7 +76,7 @@ class DBFacadeInterface(ABC):
         ...
 
     @abstractmethod
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
+    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
         """Получение списка услуг"""
         ...
 

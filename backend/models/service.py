@@ -39,7 +39,6 @@ class ServiceBase(ApiModel):
     })
 
 
-
 class ServiceCreate(ServiceBase):
     pass
 
@@ -56,3 +55,9 @@ class ServiceGet(ServiceBase):
     guid: UUID4 = Field(..., description="Идентификатор услуги")
     created_at: dt = Field(..., description="Время создания услуги в формате RFC-3339")
     updated_at: dt = Field(..., description="Время последнего услуги сер в формате RFC-3339")
+
+
+class ServiceGetAll(ApiModel):
+    guid: UUID4 = Field(..., description="Идентификатор услуги")
+    name: str = Field(..., description="Название")
+    

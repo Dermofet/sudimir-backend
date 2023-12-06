@@ -93,7 +93,7 @@ class DBFacade(DBFacadeInterface):
         return await self._service_dao.get_by_all_fields(name=name, price=price, datetime=datetime,
                                                          max_number_persons=max_number_persons, type=type)
 
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
+    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
         """Получение списка услуг"""
 
         return await self._service_dao.get_all(limit=limit, offset=offset)

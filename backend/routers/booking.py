@@ -62,7 +62,7 @@ async def create_booking(
 
 
 @router.get(
-    "/{id}",
+    "/id/{id}",
     status_code=status.HTTP_200_OK,
     summary="Получить информацию о брони",
     response_description="Информация о брони успешно получена",
@@ -83,7 +83,6 @@ async def get_booking(
     booking_service: BookingService = Depends(),
 ) -> models.BookingGet:
     return await booking_service.get_booking_by_id(user_id=user_id, booking_id=id_)
-
 
 @router.put(
     "/{id}/status",

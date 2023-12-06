@@ -42,7 +42,7 @@ async def create_service(
     status_code=status.HTTP_200_OK,
     summary="Получить список услуг",
     response_description="Список услуг успешно получен",
-    response_model=list[models.ServiceGet],
+    response_model=list[models.ServiceGetAll],
     responses={
         400: models.errors.BAD_REQUEST,
         429: models.errors.TOO_MANY_REQUESTS,
