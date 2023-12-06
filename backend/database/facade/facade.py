@@ -93,7 +93,7 @@ class DBFacade(DBFacadeInterface):
         return await self._service_dao.get_by_all_fields(name=name, price=price, datetime=datetime,
                                                          max_number_persons=max_number_persons, type=type)
 
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
+    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
         """Получение списка услуг"""
 
         return await self._service_dao.get_all(limit=limit, offset=offset)
@@ -117,6 +117,11 @@ class DBFacade(DBFacadeInterface):
         """Получение брони по id"""
 
         return await self._booking_dao.get_by_id(guid=guid)
+
+    async def get_all_bookings(self, limit: int, offset: int) -> List[models.BookingGet]:
+        """Получение списка бронирований"""
+
+        return await self._booking_dao.get_all(limit=limit, offset=offset)
 
     async def get_all_bookings_by_user_id(self, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
         """Получение всех бронирований по id пользователя"""

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Body, Depends, Path, Query, Response
 from pydantic import UUID4
@@ -71,6 +71,7 @@ async def create_booking(
         400: models.errors.BAD_REQUEST,
         401: models.errors.UNAUTHORIZED,
         403: models.errors.FORBIDDEN,
+        404: models.errors.NOT_FOUND,
         422: models.errors.UNPROCESSABLE_ENTITY,
         429: models.errors.TOO_MANY_REQUESTS,
         500: models.errors.INTERNAL_SERVER_ERROR,
@@ -83,6 +84,31 @@ async def get_booking(
     booking_service: BookingService = Depends(),
 ) -> models.BookingGet:
     return await booking_service.get_booking_by_id(user_id=user_id, booking_id=id_)
+
+@router.get(
+    "/all",
+    status_code=status.HTTP_200_OK,
+    summary="Получить информацию о брони",
+    response_description="Информация о брони успешно получена",
+    response_model=Dict[str, List[models.BookingGet]],
+    responses={
+        400: models.errors.BAD_REQUEST,
+        401: models.errors.UNAUTHORIZED,
+        403: models.errors.FORBIDDEN,
+        422: models.errors.UNPROCESSABLE_ENTITY,
+        429: models.errors.TOO_MANY_REQUESTS,
+        500: models.errors.INTERNAL_SERVER_ERROR,
+        503: models.errors.SERVICE_UNAVAILABLE,
+    },
+)
+async def get_all_bookings(
+    limit: int = Query(constants.MAX_LIMIT, ge=1, le=constants.MAX_LIMIT, description="Ограничение на количество броней"),
+    offset: int = Query(0, ge=0, le=constants.MAX_OFFSET, description="Смещение"),
+    user_id: UUID4 = Depends(get_user_from_access_token),
+    booking_service: BookingService = Depends(),
+) -> Dict[str, List[models.BookingGet]]:
+    result = await booking_service.get_all_bookings(user_id=user_id, limit=limit, offset=offset)
+    return {"bookings": result}
 
 @router.put(
     "/{id}/status",

@@ -1,10 +1,10 @@
-from typing import List, Optional
+from typing import List, Dict
 
-from fastapi import APIRouter, Body, Depends, Path, Query, Response
+from fastapi import APIRouter, Body, Depends, Path, Query
 from pydantic import UUID4
 from starlette import status
 
-from backend import constants, models
+from backend import models
 from backend.middleware.auth import verify_access_token
 from backend.services.service import ServiceService
 from backend.utils.auth import get_user_from_access_token
@@ -42,7 +42,7 @@ async def create_service(
     status_code=status.HTTP_200_OK,
     summary="Получить список услуг",
     response_description="Список услуг успешно получен",
-    response_model=list[models.ServiceGetAll],
+    response_model=Dict[str, List[models.ServiceGet]],
     responses={
         400: models.errors.BAD_REQUEST,
         429: models.errors.TOO_MANY_REQUESTS,
@@ -54,8 +54,9 @@ async def get_service_all(
     limit: int = Query(default=10, description="Количество услуг", alias="limit"),
     offset: int = Query(default=0, description="Смещение", alias="offset"),
     service_service: ServiceService = Depends(),
-) -> List[models.ServiceGet]:
-    return await service_service.get_all(limit=limit, offset=offset)
+) -> Dict[str, List[models.ServiceGet]]:
+    result = await service_service.get_all(limit=limit, offset=offset)
+    return {"services": result}
 
 
 @router_without_token.get(

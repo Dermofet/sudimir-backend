@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Body, Depends, Path, Query, Response
 from pydantic import UUID4
@@ -161,7 +161,7 @@ async def get_user_bookings(
     status_code=status.HTTP_200_OK,
     summary="Получить список пользователей",
     response_description="Список пользователей успешно получен",
-    response_model=List[models.UserGetWithoutPassword],
+    response_model=Dict[str, List[models.UserGetWithoutPassword]],
     responses={
         400: models.errors.BAD_REQUEST,
         401: models.errors.UNAUTHORIZED,
@@ -177,15 +177,16 @@ async def get_all_users(
     offset: int = Query(default=0, description="Смещение", alias="offset"),
     user_id: UUID4 = Depends(get_user_from_access_token),
     user_service: UserService = Depends(),
-) -> List[models.UserGetWithoutPassword]:
-    return await user_service.get_all_users(user_id=user_id, limit=limit, offset=offset)
+) -> Dict[str, List[models.UserGetWithoutPassword]]:
+    result = await user_service.get_all_users(user_id=user_id, limit=limit, offset=offset)
+    return {"users": result}
 
 @router.get(
     "/all/{role}",
     status_code=status.HTTP_200_OK,
     summary="Получить список пользователей с определенной ролью",
     response_description="Список пользователей успешно получен",
-    response_model=List[models.UserGetWithoutPassword],
+    response_model=Dict[str, List[models.UserGetWithoutPassword]],
     responses={
         400: models.errors.BAD_REQUEST,
         401: models.errors.UNAUTHORIZED,
@@ -202,9 +203,9 @@ async def get_all_users(
     role: models.UserRole = Path(description="Роль пользователя", alias="role"),
     user_id: UUID4 = Depends(get_user_from_access_token),
     user_service: UserService = Depends(),
-) -> List[models.UserGet]:
-    return await user_service.get_all_users_with_role(user_id=user_id, limit=limit, offset=offset, role=role)
-
+) -> Dict[str, List[models.UserGetWithoutPassword]]:
+    result = await user_service.get_all_users_with_role(user_id=user_id, limit=limit, offset=offset, role=role)
+    return {"users": result}
 
 @router.get(
     "/{id}",

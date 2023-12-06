@@ -37,6 +37,7 @@ class Config(_Settings):
     POSTGRES_SERVER: str = Field(..., description="Postgres server")
     POSTGRES_PORT: int = Field(..., description="Postgres port")
     POSTGRES_DB: str = Field(..., description="Postgres database")
+    EXTERNAL_POSTGRES_PORT: Optional[int] = Field(None, description="Postgres external port")
 
     # JWT
     JWT_SECRET: str = Field(..., description="JWT secret")

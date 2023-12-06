@@ -48,7 +48,7 @@ class ServiceDAO:
 
         return models.ServiceGet.model_validate(db_service) if db_service else None
 
-    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
+    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGet]:
         """Получение списка услуг"""
 
         query = select(tables.Service).limit(limit).offset(offset)

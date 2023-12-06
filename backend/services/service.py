@@ -19,7 +19,7 @@ class ServiceService:
         log.debug(f"Пользователь {user_id}: запрос на создание услуги")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN))
 
         await self._check_service_exists_by_all_fields(user_id=user_id, service=service)
 
@@ -41,7 +41,7 @@ class ServiceService:
 
         return db_service
 
-    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
+    async def get_all(self, limit: int, offset: int) -> List[models.ServiceGet]:
         """Получение списка услуг"""
 
         log.debug("Запрос на получение списка услуг")
@@ -58,7 +58,7 @@ class ServiceService:
         log.debug(f"Пользователь {user_id}: запрос на изменение услуги по id: {service_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN))
 
         await self._check_service_exists_by_id(user_id=user_id, service_id=service_id)
 
@@ -75,7 +75,7 @@ class ServiceService:
         log.debug(f"Пользователь {user_id}: запрос на удаление услуги по id: {service_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN))
 
         await self._check_service_exists_by_id(user_id=user_id, service_id=service_id)
 

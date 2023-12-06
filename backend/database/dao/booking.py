@@ -36,6 +36,14 @@ class BookingDAO:
         db_booking = (await self._session.execute(query)).scalar()
 
         return models.BookingGet.model_validate(db_booking) if db_booking else None
+    
+    async def get_all(self, limit: int, offset: int) -> List[models.BookingGet]:
+        """Получение всех броней"""
+
+        query = select(tables.Booking).limit(limit).offset(offset)
+        db_bookings = (await self._session.execute(query)).scalars().unique().all()
+
+        return [models.BookingGet.model_validate(db_booking) for db_booking in db_bookings]
 
     async def get_all_by_user_id(self, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
         """Получение всех броней по id пользователя"""

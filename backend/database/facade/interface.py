@@ -76,7 +76,7 @@ class DBFacadeInterface(ABC):
         ...
 
     @abstractmethod
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGetAll]:
+    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
         """Получение списка услуг"""
         ...
 
@@ -98,6 +98,11 @@ class DBFacadeInterface(ABC):
     @abstractmethod
     async def get_booking_by_id(self, guid: UUID4) -> models.BookingGet:
         """Получение бронирования по id"""
+        ...
+
+    @abstractmethod
+    async def get_all_bookings(self, limit: int, offset: int) -> List[models.BookingGet]:
+        """Получение списка бронирований"""
         ...
 
     @abstractmethod

@@ -10,25 +10,25 @@ from backend.services.auth import AuthService
 router = APIRouter(prefix="/auth")
 
 
-@router.post(
-    "/signup",
-    status_code=status.HTTP_200_OK,
-    summary="Зарегистрировать нового пользователя",
-    response_description="Регистрация прошла успешно",
-    response_model=models.Token,
-    responses={
-        400: models.errors.BAD_REQUEST,
-        422: models.errors.UNPROCESSABLE_ENTITY,
-        429: models.errors.TOO_MANY_REQUESTS,
-        500: models.errors.INTERNAL_SERVER_ERROR,
-        503: models.errors.SERVICE_UNAVAILABLE,
-    },
-)
-async def signup(
-    user: models.UserSignUp = Body(..., description="Тело запроса для создания пользователя"),
-    auth_service: AuthService = Depends(),
-) -> models.UserGet:
-    return await auth_service.signup(user=user)
+# @router.post(
+#     "/signup",
+#     status_code=status.HTTP_200_OK,
+#     summary="Зарегистрировать нового пользователя",
+#     response_description="Регистрация прошла успешно",
+#     response_model=models.Token,
+#     responses={
+#         400: models.errors.BAD_REQUEST,
+#         422: models.errors.UNPROCESSABLE_ENTITY,
+#         429: models.errors.TOO_MANY_REQUESTS,
+#         500: models.errors.INTERNAL_SERVER_ERROR,
+#         503: models.errors.SERVICE_UNAVAILABLE,
+#     },
+# )
+# async def signup(
+#     user: models.UserSignUp = Body(..., description="Тело запроса для создания пользователя"),
+#     auth_service: AuthService = Depends(),
+# ) -> models.UserGet:
+#     return await auth_service.signup(user=user)
 
 
 @router.post(

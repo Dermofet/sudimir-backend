@@ -51,6 +51,21 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: бронь {booking_id} успешно получена")
 
         return db_service
+    
+    async def get_all_bookings(self, user_id: UUID4, limit: int, offset: int) -> List[models.BookingGet]:
+        """Получить все брони"""
+
+        log.debug(f"Пользователь {user_id}: запрос на получение всех броней")
+
+        user = await self._db_facade.get_user_by_id(guid=user_id)
+        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER,
+                                                                models.UserRole.ADMIN))
+
+        db_bookings = await self._db_facade.get_all_bookings(limit=limit, offset=offset)
+
+        log.debug(f"Пользователь {user_id}: все брони успешно получены")
+
+        return db_bookings
 
     async def change_booking_status(self, user_id: UUID4, booking_id: UUID4, status: models.BookingStatusUpdate) -> models.BookingGet:
         """Изменить статус брони"""
