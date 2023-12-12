@@ -111,6 +111,11 @@ class DBFacadeInterface(ABC):
         ...
 
     @abstractmethod
+    async def get_cur_number_persons(self, service_id: UUID4) -> int:
+        """Получение текущего количества людей, которые пойдут на экскурсию"""
+        ...
+
+    @abstractmethod
     async def change_booking_status(self, guid: UUID4, status: models.BookingStatusUpdate) -> models.BookingGet:
         """Изменение статуса бронирования"""
         ...

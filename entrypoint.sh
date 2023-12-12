@@ -2,7 +2,7 @@
 
 echo "$ENV"
 
-sleep 10
+sleep 3
 
 if [ "$ENV" == "development" ]; then
   alembic upgrade head

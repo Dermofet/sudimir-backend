@@ -18,8 +18,8 @@ class UserService:
 
         log.debug(f"Пользователь {requester_id}: запрос на создание пользователя: {user}")
 
-        user = await self._db_facade.get_user_by_id(guid=requester_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN))
+        requester = await self._db_facade.get_user_by_id(guid=requester_id)
+        await check_user_existence_and_access(user=requester, roles=(models.UserRole.ADMIN))
 
         db_user = await self._db_facade.signup(user=user)
 

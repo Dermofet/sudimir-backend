@@ -1,19 +1,18 @@
 import uuid
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func
+from sqlalchemy import Column, String, Boolean, DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from backend.database.connection import Base
-from backend.database.tables.booking import Booking  # Import the Booking model
 
 class User(Base):
     __tablename__ = "users"
 
     guid = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
 
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(50), nullable=False)
+    first_name = Column(String(50), nullable=True)
+    last_name = Column(String(50), nullable=True)
     middle_name = Column(String(50), nullable=True)
-    password = Column(String, nullable=False)
+    password = Column(String, nullable=True)
 
     phone = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=True)

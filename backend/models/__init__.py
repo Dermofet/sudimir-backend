@@ -3,4 +3,5 @@ from backend.models.user import UserSignUp, UserSignIn, UserGet, UserUpdate, Use
 from backend.models.token import Token
 from backend.models import errors
 from backend.models.service import ServiceCreate, ServiceUpdate, ServicePatch, ServiceGet, ServiceType
-from backend.models.booking import BookingCreate, BookingUpdate, BookingPatch, BookingGet, BookingStatusType, BookingStatusUpdate
+from backend.models.booking import BookingCreate, BookingUpdate, BookingPatch, BookingGet, BookingStatusType, \
+    BookingStatusUpdate

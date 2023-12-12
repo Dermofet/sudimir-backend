@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Tuple, Union
 
 from fastapi import Depends, HTTPException, status
@@ -13,26 +14,49 @@ class BookingService:
     def __init__(self, db_facade: DBFacadeInterface = Depends(get_db_facade)):
         self._db_facade = db_facade
 
-    async def create_booking(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
+    async def create_booking(self, requester_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создать бронь"""
 
-        log.debug(f"Пользователь {user_id}: запрос на создание брони")
+        log.debug(f"Пользователь {requester_id}: запрос на создание брони")
 
-        user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.USER,
-                                                                models.UserRole.WORKER,
+        requester = await self._db_facade.get_user_by_id(guid=requester_id)
+        await check_user_existence_and_access(user=requester, roles=(models.UserRole.WORKER,
                                                                 models.UserRole.ADMIN))
+        
+        user = await self._db_facade.get_user_by_phone(phone=booking.phone)
+        if not user:
+            new_user = models.UserSignUp(
+                first_name=booking.first_name,
+                middle_name=booking.middle_name,
+                last_name=booking.last_name,
+                phone=booking.phone,
+                role=models.UserRole.USER,
+                password=None
+            )
+            user = await self._db_facade.signup(user=new_user)
+        
+        service = await self._db_facade.get_service_by_id(guid=booking.service_guid)
+        if not service:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Услуга не найдена",
+            )
+        if service.datetime < datetime.datetime.now():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Услуга уже прошла",
+            )
+        cur_number_persons = await self._db_facade.get_cur_number_persons(service_id=booking.service_guid)
+        if (booking.number_persons + cur_number_persons) > service.max_number_persons:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Нет свободных мест. В текущий момент уже забронировано мест: {str(cur_number_persons)}",
+            )
 
-        # if not await self._check_booking_exists_by_user_and_service(user_id=user_id, service_id=booking.service_guid):
-        #     raise HTTPException(
-        #         status_code=status.HTTP_409_CONFLICT,
-        #         detail="Вы уже забронировали эту услугу",
-        #     )
-
-        db_booking = await self._db_facade.create_booking(requester_id=requester_id, user_id=user_id, booking=booking)
+        db_booking = await self._db_facade.create_booking(requester_id=requester_id, user_id=user.guid, booking=booking)
         await self._db_facade.commit()
 
-        log.debug(f"Пользователь {user_id}: бронь успешно создана")
+        log.debug(f"Пользователь {requester_id}: бронь успешно создана")
 
         return db_booking
 

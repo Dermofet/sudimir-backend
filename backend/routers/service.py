@@ -131,10 +131,9 @@ async def patch_service_by_id(
 
 @router_with_token.delete(
     "/{id}",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
     summary="Удалить услугу",
     response_description="Услуга успешно удалена",
-    response_model=models.ServiceGet,
     responses={
         400: models.errors.BAD_REQUEST,
         401: models.errors.UNAUTHORIZED,
@@ -146,8 +145,8 @@ async def patch_service_by_id(
     },
 )
 async def delete_service_by_id(
-    id_: UUID4 = Path(..., description="Идентификатор услуги", alias="id"),
+    service_id: UUID4 = Path(..., description="Идентификатор услуги", alias="id"),
     user_id: UUID4 = Depends(get_user_from_access_token),
     service_service: ServiceService = Depends(),
-) -> models.ServiceGet:
-    return await service_service.delete_service(user_id=user_id, service_id=id_)
+):
+    return await service_service.delete_service(user_id=user_id, service_id=service_id)

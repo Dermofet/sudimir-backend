@@ -15,8 +15,8 @@ class UserRole(str, Enum):
 
 
 class UserBase(ApiModel):
-    first_name: str = Field(..., description="Имя")
-    last_name: str = Field(..., description="Фамилия")
+    first_name:  Optional[str] = Field(..., description="Имя")
+    last_name:  Optional[str] = Field(..., description="Фамилия")
     middle_name: Optional[str] = Field(None, description="Отчество")
     email: Optional[EmailStr] = Field(None, description="Почта")
     phone: str = Field(..., description="Номер телефона")
@@ -26,7 +26,7 @@ class UserBase(ApiModel):
     @classmethod
     def validate_phone_number(cls, value):
         try:
-            phone_number = phonenumbers.parse(value, )
+            phone_number = phonenumbers.parse(value)
         except phonenumbers.phonenumberutil.NumberParseException as e:
             raise ValueError('Некорректный номер телефона') from e
 
@@ -62,7 +62,7 @@ class UserSignIn(ApiModel):
         return v
 
 class UserSignUp(UserBase):
-    password: str = Field(..., description="Пароль")
+    password: Optional[str] = Field(..., description="Пароль")
 
 class UserChangePassword(ApiModel):
     guid: UUID4 = Field(..., description="Идентификатор пользователя")

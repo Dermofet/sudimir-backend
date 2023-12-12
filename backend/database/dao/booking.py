@@ -1,8 +1,7 @@
 from typing import Optional, List
-from datetime import datetime as dt
 
 from pydantic import UUID4
-from sqlalchemy import BigInteger, select, update, delete
+from sqlalchemy import func, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend import models
@@ -18,7 +17,9 @@ class BookingDAO:
     async def create(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создание брони"""
 
-        db_booking = tables.Booking(**booking.model_dump(), 
+        db_booking = tables.Booking(service_guid=booking.service_guid,
+                                    status=booking.status,
+                                    number_persons=booking.number_persons,
                                     user_guid=user_id, 
                                     user_created=requester_id, 
                                     user_updated=requester_id)
@@ -52,6 +53,14 @@ class BookingDAO:
         db_bookings = (await self._session.execute(query)).scalars().unique().all()
 
         return [models.BookingGet.model_validate(db_booking) for db_booking in db_bookings]
+    
+    async def get_cur_number_persons(self, service_id: UUID4) -> int:
+        """Получение текущего количества мест"""
+
+        query = select(func.sum(tables.Booking.number_persons)).where(tables.Booking.service_guid == service_id)
+        sum_of_number_persons  = (await self._session.execute(query)).scalar()
+
+        return sum_of_number_persons or 0
 
     async def change_status(self, guid: UUID4, status: models.BookingStatusType) -> models.BookingGet:
         """Изменение статуса брони"""
