@@ -36,7 +36,6 @@ async def create_user(
     return await user_service.create_user(requester_id, user=user)
 
 
-
 @router.get(
     "/me",
     status_code=status.HTTP_200_OK,
@@ -56,7 +55,7 @@ async def create_user(
 async def get_current_user(
     user_id: UUID4 = Depends(get_user_from_access_token),
     user_service: UserService = Depends(),
-) -> models.UserGet:
+) -> models.UserGetWithoutPassword:
     return await user_service.get_user_by_id(user_id=user_id, guid=user_id)
 
 

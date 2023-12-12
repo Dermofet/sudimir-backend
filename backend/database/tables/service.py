@@ -22,4 +22,4 @@ class Service(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    bookings_rel = relationship("Booking", back_populates="service_rel", lazy="joined", uselist=True)
+    bookings_rel = relationship("Booking", back_populates="service_rel", lazy="joined", uselist=True, cascade="all, delete-orphan")

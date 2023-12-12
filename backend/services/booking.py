@@ -164,7 +164,7 @@ class BookingService:
         db_booking = await self._db_facade.get_booking_by_id(guid=booking_id)
 
         if db_booking:
-            log.dubug(f"Пользователь {user_id}: бронь c id {booking_id} уже существует")
+            log.debug(f"Пользователь {user_id}: бронь c id {booking_id} уже существует")
             return True
 
         log.debug(f"Пользователь {user_id}: бронь с id {booking_id} не существует")

@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from backend.logging import log
 from pydantic import UUID4
 
@@ -19,9 +19,10 @@ class UserService:
         log.debug(f"Пользователь {requester_id}: запрос на создание пользователя: {user}")
 
         requester = await self._db_facade.get_user_by_id(guid=requester_id)
-        await check_user_existence_and_access(user=requester, roles=(models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=requester_id, user=requester, roles=(models.UserRole.ADMIN))
 
         db_user = await self._db_facade.signup(user=user)
+        await self._db_facade.commit()
 
         log.debug(f"Пользователь {requester_id}: создание пользователя: {user}")
 
@@ -33,7 +34,7 @@ class UserService:
         log.debug(f"Пользователь {user_id}: запрос на получение всех пользователей: {limit}, {offset}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         db_users = await self._db_facade.get_all_users(limit=limit, offset=offset)
 
@@ -46,14 +47,14 @@ class UserService:
 
         log.debug(f"Пользователь {user_id}: запрос на получение пользователя по id: {guid}")
 
-        if user_id != guid:
-            user = await self._db_facade.get_user_by_id(guid=user_id)
-            await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        user = await self._db_facade.get_user_by_id(guid=user_id)
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         db_user = await self._db_facade.get_user_by_id(guid=guid)
 
         log.debug(f"Пользователь {guid} успешно получен")
 
+        print(db_user)
         return db_user
 
     async def get_user_by_email(self, user_id: UUID4, email: str) -> models.UserGet:
@@ -62,7 +63,7 @@ class UserService:
         log.debug(f"Пользователь {user_id}: запрос на получение пользователя по email: {email}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         db_user = await self._db_facade.get_user_by_email(email=email)
 
@@ -76,7 +77,7 @@ class UserService:
         log.debug(f"Пользователь {user_id}: запрос на получение всех пользователей с определенным ролем: {limit}, {offset}, {role}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=models.UserRole.ADMIN)
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=models.UserRole.ADMIN)
 
         db_users = await self._db_facade.get_all_users_with_role(limit=limit, offset=offset, role=role)
 
@@ -90,7 +91,7 @@ class UserService:
         log.debug(f"Пользователь {recipient_id}: запрос на получение всех бронирований пользователя {user_id}: {limit}, {offset}")
 
         user = await self._db_facade.get_user_by_id(guid=recipient_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.ADMIN,
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.ADMIN,
                                                                 models.UserRole.WORKER,
                                                                 models.UserRole.USER))
 
@@ -105,9 +106,8 @@ class UserService:
 
         log.debug(f"Пользователь {user_id}: запрос на изменение пользователя по id: {guid}")
 
-        if user_id != guid:
-            user = await self._db_facade.get_user_by_id(guid=user_id)
-            await check_user_existence_and_access(user=user, roles=models.UserRole.ADMIN)
+        user = await self._db_facade.get_user_by_id(guid=user_id)
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=models.UserRole.ADMIN)
 
         db_user = await self._db_facade.change_user(guid=user_id, user=user)
         await self._db_facade.commit()
@@ -123,9 +123,11 @@ class UserService:
 
         if user_id != guid:
             user = await self._db_facade.get_user_by_id(guid=user_id)
-            await check_user_existence_and_access(user=user, roles=models.UserRole.ADMIN)
+            await check_user_existence_and_access(user_id=user_id, user=user, roles=models.UserRole.ADMIN)
 
-        await self._db_facade.delete_user(guid=guid)
-        await self._db_facade.commit()
+            await self._db_facade.delete_user(guid=guid)
+            await self._db_facade.commit()
+        else:
+            raise HTTPException(status_code=400, detail="Нельзя удалить самого себя")
 
         log.debug(f"Пользователь {guid} успешно удален")

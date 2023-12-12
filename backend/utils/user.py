@@ -6,9 +6,9 @@ from backend import models
 from backend.logging import log
 
 
-async def check_user_existence_and_access(user: models.UserGet, roles: Tuple[models.UserRole, ...]) -> None:
+async def check_user_existence_and_access(user_id: UUID4, user: models.UserGet, roles: Tuple[models.UserRole, ...]) -> None:
     if not user:
-        log.warning(f"Попытка получения пользователя с несуществующим id: {user.guid}")
+        log.warning(f"Попытка получения пользователя с несуществующим id: {user_id}")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Пользователь не существует",

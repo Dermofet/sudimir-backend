@@ -23,8 +23,8 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     bookings_rel = relationship("Booking", back_populates="user_rel", lazy="joined", uselist=True,
-                                foreign_keys='Booking.user_guid')
+                                foreign_keys='Booking.user_guid', cascade="all, delete-orphan")
     created_bookings_rel = relationship("Booking", back_populates="user_created_rel", lazy="joined", uselist=True,
-                                        foreign_keys='Booking.user_created')
+                                        foreign_keys='Booking.user_created', cascade="all, delete-orphan")
     updated_bookings_rel = relationship("Booking", back_populates="user_updated_rel", lazy="joined", uselist=True,
-                                        foreign_keys='Booking.user_updated')
+                                        foreign_keys='Booking.user_updated', cascade="all, delete-orphan")

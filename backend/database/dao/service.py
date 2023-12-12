@@ -72,6 +72,9 @@ class ServiceDAO:
     async def delete(self, guid: UUID4) -> None:
         """Удаление услуги"""
 
+        query = delete(tables.Booking).where(tables.Booking.service_guid == guid)
+        await self._session.execute(query)
+        
         query = delete(tables.Service).where(tables.Service.guid == guid)
         await self._session.execute(query)
 

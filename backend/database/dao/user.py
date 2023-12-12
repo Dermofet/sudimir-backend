@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from pydantic import UUID4
-from sqlalchemy import BigInteger, select, update, delete
+from sqlalchemy import BigInteger, or_, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend import models
@@ -81,7 +81,17 @@ class UserDAO:
     async def delete(self, guid: UUID4) -> None:
         """Удаление пользователя"""
 
-        query = delete(tables.User).where(tables.User.guid == guid)
-        await self._session.execute(query)
+        booking_delete_query = (
+            delete(tables.Booking)
+            .where(or_(
+                tables.Booking.user_guid == guid,
+                tables.Booking.user_created == guid,
+                tables.Booking.user_updated == guid
+            ))
+        )
+        await self._session.execute(booking_delete_query)
+
+        user_delete_query = delete(tables.User).where(tables.User.guid == guid)
+        await self._session.execute(user_delete_query)
 
         await self._session.flush()

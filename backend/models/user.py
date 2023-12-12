@@ -105,4 +105,4 @@ class UserGet(UserSignUp):
     updated_at: datetime = Field(..., description="Время последнего обновления пользователя в формате RFC-3339")
 
 class UserGetWithoutPassword(UserBase):
-    pass
+    guid: UUID4 = Field(..., description="Идентификатор пользователя")
