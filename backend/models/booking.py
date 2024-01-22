@@ -21,6 +21,7 @@ class BookingBase(ApiModel):
     service_guid: UUID4 = Field(..., description="Идентификатор услуги")
     number_persons: int = Field(..., description="Количество человек")
     status: BookingStatusType = Field(..., description="Статус брони")
+    datetime: dt = Field(..., description="Дата и время брони")
 
     model_config = ConfigDict(json_encoders={
         dt: lambda d: d.strftime('%d-%m-%Y %H:%M')

@@ -20,7 +20,7 @@ class BookingService:
         log.debug(f"Пользователь {requester_id}: запрос на создание брони")
 
         requester = await self._db_facade.get_user_by_id(guid=requester_id)
-        await check_user_existence_and_access(user=requester, roles=(models.UserRole.WORKER,
+        await check_user_existence_and_access(user_id=requester_id, user=requester, roles=(models.UserRole.WORKER,
                                                                 models.UserRole.ADMIN))
         
         user = await self._db_facade.get_user_by_phone(phone=booking.phone)
@@ -66,7 +66,7 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: запрос на получение услуги по id: {booking_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.USER,
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.USER,
                                                                 models.UserRole.WORKER,
                                                                 models.UserRole.ADMIN))
 
@@ -82,7 +82,7 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: запрос на получение всех броней")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER,
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER,
                                                                 models.UserRole.ADMIN))
 
         db_bookings = await self._db_facade.get_all_bookings(limit=limit, offset=offset)
@@ -97,7 +97,7 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: запрос на изменение статуса брони по id: {status.guid}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         await self._check_booking_exists_by_id(user_id=user_id, booking_id=status.guid)
 
@@ -114,7 +114,7 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: запрос на изменение брони по id: {booking_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         if not await self._check_booking_exists_by_id(user_id=user_id, booking_id=booking_id):
             raise HTTPException(
@@ -135,7 +135,7 @@ class BookingService:
         log.debug(f"Пользователь {user_id}: запрос на удаление брони по id: {booking_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
-        await check_user_existence_and_access(user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
+        await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
         if not await self._check_booking_exists_by_id(user_id=user_id, booking_id=booking_id):
             raise  HTTPException(

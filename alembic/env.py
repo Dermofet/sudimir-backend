@@ -16,6 +16,7 @@ from backend.database.tables import *
 # access to the values within the .ini file in use.
 config = context.config
 config.set_main_option('sqlalchemy.url', my_config.DB_DSN.unicode_string())
+print(my_config.DB_DSN.unicode_string())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

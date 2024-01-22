@@ -44,7 +44,8 @@ class Config(_Settings):
     JWT_ALGORITHM: str = Field(..., description="JWT algorithm")
     JWT_EXPIRES_AT: int = Field(..., description="JWT expires at")
 
-    DB_DSN: Optional[AsyncPostgresDsn] = Field(None, description="Postgres uri for docker contaibers", validate_default=True)
+    DB_DSN: Optional[AsyncPostgresDsn] = Field(None, description="Postgres uri for docker containers", validate_default=True)
+    EXTERNAL_DB_DSN: Optional[AsyncPostgresDsn] = Field(None, description="Postgres uri for alembic", validate_default=True)
 
     @field_validator("DB_DSN", mode="before")
     def create_db_uri(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
@@ -56,6 +57,19 @@ class Config(_Settings):
             password=info.data['POSTGRES_PASSWORD'],
             host=info.data['POSTGRES_SERVER'],
             port=info.data['POSTGRES_PORT'],
+            path=f"{info.data['POSTGRES_DB'] or ''}",
+        )
+
+    @field_validator("EXTERNAL_DB_DSN", mode="before")
+    def create_db_external_uri(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
+        if isinstance(v, str):
+            return v
+        return AsyncPostgresDsn.build(
+            scheme="postgresql+asyncpg",
+            username=info.data['POSTGRES_USER'],
+            password=info.data['POSTGRES_PASSWORD'],
+            host=info.data['POSTGRES_SERVER'],
+            port=info.data['EXTERNAL_POSTGRES_PORT'],
             path=f"{info.data['POSTGRES_DB'] or ''}",
         )
 

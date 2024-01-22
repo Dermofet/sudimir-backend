@@ -52,9 +52,9 @@ class ServiceDAO:
         """Получение списка услуг"""
 
         query = select(tables.Service).limit(limit).offset(offset)
-        db_services = (await self._session.execute(query)).scalars().unique().all()
+        db_services = await self._session.execute(query)
 
-        return [models.ServiceGet.model_validate(db_service) for db_service in db_services]
+        return [models.ServiceGet.model_validate(db_service) for db_service in db_services.scalars().unique().all()]
 
     async def change(self, guid: UUID4, service: models.ServiceUpdate) -> models.ServiceGet:
         """Изменение услуги"""
