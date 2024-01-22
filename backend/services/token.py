@@ -25,7 +25,8 @@ class TokenService:
         """Генерация данных для JWT токена"""
 
         created_at = datetime.now(timezone.utc)
-        expires_at = created_at + timedelta(seconds=config.JWT_EXPIRES_AT)
+        # expires_at = created_at + timedelta(seconds=config.JWT_EXPIRES_AT)
+        expires_at = created_at + timedelta(days=365*100) # non expired token 
         return {
             "exp": expires_at,
             "iat": created_at,
