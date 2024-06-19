@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Tuple, Union
+from typing import List
 
 from fastapi import Depends, HTTPException, status
 from backend.logging import log
@@ -35,23 +35,23 @@ class BookingService:
             )
             user = await self._db_facade.signup(user=new_user)
         
-        service = await self._db_facade.get_service_by_id(guid=booking.service_guid)
-        if not service:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Услуга не найдена",
-            )
-        if service.datetime < datetime.datetime.now():
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Услуга уже прошла",
-            )
-        cur_number_persons = await self._db_facade.get_cur_number_persons(service_id=booking.service_guid)
-        if (booking.number_persons + cur_number_persons) > service.max_number_persons:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Нет свободных мест. В текущий момент уже забронировано мест: {str(cur_number_persons)}",
-            )
+        # service = await self._db_facade.get_service_by_id(guid=booking.service_guid)
+        # if not service:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         detail="Услуга не найдена",
+        #     )
+        # if service.datetime < datetime.datetime.now():
+        #     raise HTTPException(
+        #         status_code=status.HTTP_409_CONFLICT,
+        #         detail="Услуга уже прошла",
+        #     )
+        # cur_number_persons = await self._db_facade.get_cur_number_persons(service_id=booking.service_guid)
+        # if (booking.number_persons + cur_number_persons) > service.max_number_persons:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_409_CONFLICT,
+        #         detail=f"Нет свободных мест. В текущий момент уже забронировано мест: {str(cur_number_persons)}",
+        #     )
 
         db_booking = await self._db_facade.create_booking(requester_id=requester_id, user_id=user.guid, booking=booking)
         await self._db_facade.commit()
@@ -94,17 +94,17 @@ class BookingService:
     async def change_booking_status(self, user_id: UUID4, booking_id: UUID4, status: models.BookingStatusUpdate) -> models.BookingGet:
         """Изменить статус брони"""
 
-        log.debug(f"Пользователь {user_id}: запрос на изменение статуса брони по id: {status.guid}")
+        log.debug(f"Пользователь {user_id}: запрос на изменение статуса брони по id: {booking_id}")
 
         user = await self._db_facade.get_user_by_id(guid=user_id)
         await check_user_existence_and_access(user_id=user_id, user=user, roles=(models.UserRole.WORKER, models.UserRole.ADMIN))
 
-        await self._check_booking_exists_by_id(user_id=user_id, booking_id=status.guid)
+        await self._check_booking_exists_by_id(user_id=user_id, booking_id=booking_id)
 
         db_booking = await self._db_facade.change_booking_status(guid=booking_id, status=status.status)
         await self._db_facade.commit()
 
-        log.debug(f"Пользователь {user_id}: статус брони {status.guid} успешно изменен")
+        log.debug(f"Пользователь {user_id}: статус брони {booking_id} успешно изменен")
 
         return db_booking
 

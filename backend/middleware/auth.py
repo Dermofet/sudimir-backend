@@ -2,7 +2,6 @@ from fastapi import Request, status, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 from backend.config import config
-from backend.logging import log
 
 schema_bearer = HTTPBearer()
 

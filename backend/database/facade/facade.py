@@ -1,5 +1,3 @@
-from datetime import datetime as dt
-from decimal import Decimal
 from typing import List
 
 from fastapi import Depends
@@ -19,7 +17,7 @@ class DBFacade(DBFacadeInterface):
     def __init__(self, session: AsyncSession = Depends(get_session)):
         self._session = session
         self._user_dao = UserDAO(session=session)
-        self._service_dao = ServiceDAO(session=session)
+        # self._service_dao = ServiceDAO(session=session)
         self._booking_dao = BookingDAO(session=session)
 
     async def commit(self) -> None:
@@ -76,37 +74,37 @@ class DBFacade(DBFacadeInterface):
 
         return await self._user_dao.delete(guid=guid)
 
-    async def create_service(self, service: models.ServiceCreate) -> models.ServiceGet:
-        """Создания услуги"""
+    # async def create_service(self, service: models.ServiceCreate) -> models.ServiceGet:
+    #     """Создания услуги"""
 
-        return await self._service_dao.create(service=service)
+    #     return await self._service_dao.create(service=service)
 
-    async def get_service_by_id(self, guid: UUID4) -> models.ServiceGet:
-        """Получение услуги по id"""
+    # async def get_service_by_id(self, guid: UUID4) -> models.ServiceGet:
+    #     """Получение услуги по id"""
 
-        return await self._service_dao.get_by_id(guid=guid)
+    #     return await self._service_dao.get_by_id(guid=guid)
 
-    async def get_service_by_all_fields(self, name: str, price: int, datetime: dt, max_number_persons: int,
-                                        type: str) -> models.ServiceGet:
-        """Получение услуги по всем полям"""
+    # async def get_service_by_all_fields(self, name: str, price: int, datetime: dt, max_number_persons: int,
+    #                                     type: str) -> models.ServiceGet:
+    #     """Получение услуги по всем полям"""
 
-        return await self._service_dao.get_by_all_fields(name=name, price=price, datetime=datetime,
-                                                         max_number_persons=max_number_persons, type=type)
+    #     return await self._service_dao.get_by_all_fields(name=name, price=price, datetime=datetime,
+    #                                                      max_number_persons=max_number_persons, type=type)
 
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
-        """Получение списка услуг"""
+    # async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
+    #     """Получение списка услуг"""
 
-        return await self._service_dao.get_all(limit=limit, offset=offset)
+    #     return await self._service_dao.get_all(limit=limit, offset=offset)
 
-    async def change_service(self, guid: UUID4, _service: models.ServiceUpdate):
-        """Изменение услуги"""
+    # async def change_service(self, guid: UUID4, _service: models.ServiceUpdate):
+    #     """Изменение услуги"""
 
-        return await self._service_dao.change(guid=guid, service=_service)
+    #     return await self._service_dao.change(guid=guid, service=_service)
 
-    async def delete_service(self, guid: UUID4):
-        """Удаление услуги"""
+    # async def delete_service(self, guid: UUID4):
+    #     """Удаление услуги"""
 
-        return await self._service_dao.delete(guid=guid)
+    #     return await self._service_dao.delete(guid=guid)
 
     async def create_booking(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:
         """Создание брони"""

@@ -21,7 +21,8 @@ def upgrade() -> None:
         'bookings',
         sa.Column('guid', sa.UUID(), primary_key=True),
         sa.Column('user_guid', sa.UUID(), sa.ForeignKey('users.guid'), nullable=False),
-        sa.Column('service_guid', sa.UUID(), sa.ForeignKey('services.guid'), nullable=False),
+        # sa.Column('service_guid', sa.UUID(), sa.ForeignKey('services.guid'), nullable=False),
+        sa.Column('datetime', sa.DateTime(), nullable=False),
         sa.Column('status', sa.String(), nullable=False),
         sa.Column('number_persons', sa.Integer(), nullable=True),
         sa.Column('user_created', sa.UUID(), sa.ForeignKey('users.guid'), nullable=False),
@@ -30,9 +31,7 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
     )
-    op.create_unique_constraint('user_service_unique', 'bookings', ['user_guid', 'service_guid'])
 
 
 def downgrade() -> None:
-    op.drop_constraint('user_service_unique', 'bookings', type_='unique')
     op.drop_table('bookings')

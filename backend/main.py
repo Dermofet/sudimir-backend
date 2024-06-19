@@ -5,8 +5,8 @@ from backend.config import config
 from backend.middleware import *
 from backend.routers.user import router as user_router
 from backend.routers.auth import router as auth_router
-from backend.routers.service import router_with_token as service_router_with_token
-from backend.routers.service import router_without_token as service_router_without_token
+# from backend.routers.service import router_with_token as service_router_with_token
+# from backend.routers.service import router_without_token as service_router_without_token
 from backend.routers.booking import router as booking_router
 
 tags_metadata = [
@@ -24,6 +24,8 @@ app = FastAPI(
     description=config.BACKEND_DESCRIPTION,
 )
 
+# cache = RedisCache(config.REDIS_HOST, config.REDIS_PORT, config.REDIS_PASSWORD, config.REDIS_DB)
+
 # add_exception_handlers(app)
 
 app.add_middleware(
@@ -38,6 +40,6 @@ app.add_middleware(LoggingMiddleware)
 
 app.include_router(user_router, tags=["user"])
 app.include_router(auth_router, tags=["auth"])
-app.include_router(service_router_with_token, tags=["service"])
-app.include_router(service_router_without_token, tags=["service"])
+# app.include_router(service_router_with_token, tags=["service"])
+# app.include_router(service_router_without_token, tags=["service"])
 app.include_router(booking_router, tags=["booking"])

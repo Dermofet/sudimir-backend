@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from fastapi import APIRouter, Body, Depends, Path, Query, Response
+from fastapi import APIRouter, Body, Depends, Path, Query
 from pydantic import UUID4
 from starlette import status
 
@@ -10,30 +10,6 @@ from backend.services.booking import BookingService
 from backend.utils.auth import get_user_from_access_token
 
 router = APIRouter(dependencies=[Depends(verify_access_token)], prefix="/booking")
-
-
-# @router.post(
-#     "/new/user/me",
-#     status_code=status.HTTP_201_CREATED,
-#     summary="Создать бронь",
-#     response_description="Бронь успешно создана",
-#     response_model=models.BookingGet,
-#     responses={
-#         400: models.errors.BAD_REQUEST,
-#         401: models.errors.UNAUTHORIZED,
-#         403: models.errors.FORBIDDEN,
-#         422: models.errors.UNPROCESSABLE_ENTITY,
-#         429: models.errors.TOO_MANY_REQUESTS,
-#         500: models.errors.INTERNAL_SERVER_ERROR,
-#         503: models.errors.SERVICE_UNAVAILABLE,
-#     },
-# )
-# async def create_booking(
-#     booking: models.BookingCreate = Body(..., description="Тело брони"),
-#     user_id: UUID4 = Depends(get_user_from_access_token),
-#     booking_service: BookingService = Depends(),
-# ) -> models.BookingGet:
-#     return await booking_service.create_booking(requester_id=user_id, user_id=user_id, booking=booking)
 
 
 @router.post(

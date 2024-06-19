@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List
-from datetime import datetime as dt
 
 from pydantic import UUID4
 
@@ -60,35 +59,35 @@ class DBFacadeInterface(ABC):
         """Удаления пользователя"""
         ...
 
-    @abstractmethod
-    async def create_service(self, service: models.ServiceCreate) -> models.ServiceGet:
-        """Создания услуги"""
-        ...
+    # @abstractmethod
+    # async def create_service(self, service: models.ServiceCreate) -> models.ServiceGet:
+    #     """Создания услуги"""
+    #     ...
 
-    @abstractmethod
-    async def get_service_by_id(self, guid: UUID4) -> models.ServiceGet:
-        """Получение услуги по id"""
-        ...
+    # @abstractmethod
+    # async def get_service_by_id(self, guid: UUID4) -> models.ServiceGet:
+    #     """Получение услуги по id"""
+    #     ...
 
-    @abstractmethod
-    async def get_service_by_all_fields(self, name: str, price: int, datetime: dt, max_number_persons: int, type: str) -> models.ServiceGet:
-        """Получение услуги по всем полям"""
-        ...
+    # @abstractmethod
+    # async def get_service_by_all_fields(self, name: str, price: int, datetime: dt, max_number_persons: int, type: str) -> models.ServiceGet:
+    #     """Получение услуги по всем полям"""
+    #     ...
 
-    @abstractmethod
-    async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
-        """Получение списка услуг"""
-        ...
+    # @abstractmethod
+    # async def get_all_services(self, limit: int, offset: int) -> List[models.ServiceGet]:
+    #     """Получение списка услуг"""
+    #     ...
 
-    @abstractmethod
-    async def change_service(self, guid: UUID4, service: models.ServiceUpdate):
-        """Изменение услуги"""
-        ...
+    # @abstractmethod
+    # async def change_service(self, guid: UUID4, service: models.ServiceUpdate):
+    #     """Изменение услуги"""
+    #     ...
 
-    @abstractmethod
-    async def delete_service(self, guid: UUID4):
-        """Удаление услуги"""
-        ...
+    # @abstractmethod
+    # async def delete_service(self, guid: UUID4):
+    #     """Удаление услуги"""
+    #     ...
 
     @abstractmethod
     async def create_booking(self, requester_id: UUID4, user_id: UUID4, booking: models.BookingCreate) -> models.BookingGet:

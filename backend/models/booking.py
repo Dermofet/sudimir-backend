@@ -13,14 +13,13 @@ class BookingStatusType(str, Enum):
 
 
 class BookingStatusUpdate(ApiModel):
-    guid: UUID4 = Field(..., description="Идентификатор брони")
     status: BookingStatusType = Field(..., description="Статус брони")
 
 
 class BookingBase(ApiModel):
-    service_guid: UUID4 = Field(..., description="Идентификатор услуги")
     number_persons: int = Field(..., description="Количество человек")
     status: BookingStatusType = Field(..., description="Статус брони")
+    datetime: dt = Field(..., description="Время бронирования")
 
     model_config = ConfigDict(json_encoders={
         dt: lambda d: d.strftime('%d-%m-%Y %H:%M')
@@ -28,12 +27,11 @@ class BookingBase(ApiModel):
 
 
 class BookingCreate(BookingBase):
-    first_name: Optional[str] = Field(..., description="Имя пользователя")
+    first_name: Optional[str] = Field(None, description="Имя пользователя")
+    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
     middle_name: Optional[str] = Field(None, description="Отчество пользователя")
-    last_name: Optional[str] = Field(..., description="Фамилия пользователя")
-
     phone: str = Field(..., description="Номер телефона пользователя")
-
+    
     @field_validator('phone')
     @classmethod
     def validate_phone_number(cls, value):
@@ -58,8 +56,12 @@ class BookingPatch(BookingBase):
 
 class BookingGet(BookingBase):
     guid: UUID4 = Field(..., description="Идентификатор услуги")
-    service_guid: UUID4 = Field(..., description="Идентификатор услуги")
     user_guid: UUID4 = Field(..., description="Идентификатор пользователя")
+
+    first_name: Optional[str] = Field(None, description="Имя пользователя")
+    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
+    middle_name: Optional[str] = Field(None, description="Отчество пользователя")
+    phone: Optional[str] = Field(None, description="Номер телефона пользователя")
 
     user_created: UUID4 = Field(..., description="Идентификатор пользователя, создавшего услугу")
     user_updated: UUID4 = Field(..., description="Идентификатор пользователя, обновившего услугу")
